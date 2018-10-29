@@ -9,7 +9,7 @@ require 'includes/form_handlers/login_handler.php';
     <title>Welcome to Swirlfeed!</title>
     <!--    css,jqueryの読み込み-->
     <link rel="stylesheet" type="text/css" href="assets/css/register_style.css">
-    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.3.1/jquery.min.js"></script>
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/2.1.3/jquery.min.js"></script>
     <script src="assets/js/register.js"></script>
 </head>
 <body>
@@ -23,7 +23,7 @@ require 'includes/form_handlers/login_handler.php';
         
         $(document).ready(function() {
             $("#first").hide();
-            $("#second").hide();
+            $("#second").show();
         });
         
         </script>

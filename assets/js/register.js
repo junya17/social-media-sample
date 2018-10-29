@@ -1,4 +1,4 @@
-$(document).ready(function(){
+$(document).ready(function() {
     
     //ログイン画面を表示
     $("#signup").click(function() {
@@ -13,4 +13,5 @@ $(document).ready(function(){
             $("#first").slideDown("slow");
         });
     });
-})
+    
+});
