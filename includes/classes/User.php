@@ -26,6 +26,14 @@ class User {
 		$row = mysqli_fetch_array($query);
 		return $row['first_name'] . " " . $row['last_name'];
 	}
+    //画像
+    public function getProfilePic() {
+		$username = $this->user['username'];
+		$query = mysqli_query($this->con, "SELECT profile_pic, last_name FROM users WHERE username='$username'");
+		$row = mysqli_fetch_array($query);
+		return $row['profile_pic'];
+	}
+
 
 	public function isClosed() {
 		$username = $this->user['username'];
