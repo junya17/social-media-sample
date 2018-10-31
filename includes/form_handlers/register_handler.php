@@ -103,7 +103,7 @@ if(isset($_POST['register_button'])){
         
         $rand = rand(1,2); //1から2までの数字をランダムに返す。
         if($rand == 1)
-            $profile_pic = "assets/images/profile_pics/defaults/head_deep_blue_png";
+            $profile_pic = "assets/images/profile_pics/defaults/head_deep_blue.png";
         else if($rand == 2)
             $profile_pic = "assets/images/profile_pics/defaults/head_emerald.png";
         

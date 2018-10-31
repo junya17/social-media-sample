@@ -1,5 +1,9 @@
 <?php
 require 'config/config.php';
+include("includes/classes/User.php");
+include("includes/classes/Post.php");
+include("includes/classes/Message.php");
+
 
 //セッションにusernameがある場合にログインする。それ以外はログインページにリダイレクト
 if(isset($_SESSION['username'])) {
@@ -19,17 +23,27 @@ if(isset($_SESSION['username'])) {
     <title>Welcome to Swirlfeed</title>
 
     <!--Javascript-->
+
     <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.3.1/jquery.min.js"></script>
     <script src="assets/js/bootstrap.js"></script>
+    <script src="assets/js/demo.js"></script>
+    <script src="assets/js/bootbox.min.js"></script>
+    <script src="assets/js/jquery.Jcrop.js"></script>
+    <script src="assets/js/jcrop_bits.js"></script>
+
+    
 
     <!--CSS-->
     <link rel="stylesheet" href="https://use.fontawesome.com/releases/v5.4.2/css/all.css" integrity="sha384-/rXc/GQVaYpyDdyxK+ecHPVYJSN9bmVFBvjA/9eOB+pb3F2w2N6fc5qB9Ew5yIns" crossorigin="anonymous">
     <link rel="stylesheet" type="text/css" href="assets/css/bootstrap.css">
     <link rel="stylesheet" type="text/css" href="assets/css/style.css">
+    <link rel="stylesheet" href="assets/css/jquery.Jcrop.css" type="text/css" />
+    
 </head>
 <body>
     
     <div class="top_bar">
+       
         <div class="logo">
             <a href="index.php">Swirlfeed!</a>
         </div>
@@ -47,7 +61,7 @@ if(isset($_SESSION['username'])) {
             <a href="index.php">
                 <i class="fa fa-bell-o fa-lg"></i>
             </a>
-            <a href="index.php">
+            <a href="requests.php">
                 <i class="fa fa-users fa-lg"></i>
             </a>
             <a href="index.php">
@@ -58,7 +72,8 @@ if(isset($_SESSION['username'])) {
             </a>
         </nav>
     </div>
-    <div class="wrapper">
+    
+<div class="wrapper">
         
    
 

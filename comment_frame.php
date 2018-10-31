@@ -1,19 +1,4 @@
-<html>
-<head>
-    <title></title>
-    <link rel="stylesheet" type="text/css" href="assets/css/style.css">
-</head>
-<body>
-   
-    <style type="text/css">
-        * {
-            font-size: 12px;
-            font-family: Arial, Helvetica, sans-serif;
-        }
-        
-    </style>
-   
-    <?php
+<?php
     require 'config/config.php';
     include("includes/classes/User.php");
     include("includes/classes/Post.php");
@@ -30,6 +15,22 @@
     }
 
     ?>
+
+<html>
+<head>
+    <title></title>
+    <link rel="stylesheet" type="text/css" href="assets/css/style.css">
+</head>
+<body>
+   
+    <style type="text/css">
+        * {
+            font-size: 12px;
+            font-family: Arial, Helvetica, sans-serif;
+        }
+        
+    </style>
+   
     <script>
         function toggle() {
             var element = document.getElementById("comment_section");
@@ -154,6 +155,8 @@
             
             <?php
         }
+    }else{
+        echo "<center><br><br>No Comments to Show!</center>";
     }
     
     ?>
