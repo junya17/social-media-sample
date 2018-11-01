@@ -9,6 +9,8 @@ class Post {
 	}
 
 	public function submitPost($body, $user_to) {
+		$date_added = date("Y-m-d H:i:s");
+		$query = mysqli_query($this->con, "INSERT INTO posts VALUES('', 'sda', 'asdfsd', 'asdfsdaf', '$date_added', 'no', 'no', '0')");
 		$body = strip_tags($body); //removes html tags 
 		$body = mysqli_real_escape_string($this->con, $body);
 		$check_empty = preg_replace('/\s+/', '', $body); //Deltes all spaces 
@@ -31,6 +33,10 @@ class Post {
 			$returned_id = mysqli_insert_id($this->con);
 
 			//Insert notification 
+            if($user_to != 'none') {
+                $notification = new Notification($this->con, $added_by);
+                $notification->insertNotification($returned_id, $user_to, "Like");
+            }
 
 			//Update post count for user 
 			$num_posts = $this->user_obj->getNumPosts();
@@ -83,8 +89,8 @@ class Post {
 				}
 
 				$user_logged_obj = new User($this->con, $userLoggedIn);
-                if($user_logged_obj->isFriend($added_by)){
-                    
+				if($user_logged_obj->isFriend($added_by)){
+
 					if($num_iterations++ < $start)
 						continue; 
 
@@ -96,11 +102,12 @@ class Post {
 					else {
 						$count++;
 					}
-                    
-                    if($userLoggedIn == $added_by)
-                        $delete_button = "<button class='delete_button btn-danger' id='post$id'>X</button>";
-                    else
-                        $delete_button = "";
+
+					if($userLoggedIn == $added_by)
+						$delete_button = "<button class='delete_button btn-danger' id='post$id'>X</button>";
+					else 
+						$delete_button = "";
+
 
 					$user_details_query = mysqli_query($this->con, "SELECT first_name, last_name, profile_pic FROM users WHERE username='$added_by'");
 					$user_row = mysqli_fetch_array($user_details_query);
@@ -108,28 +115,30 @@ class Post {
 					$last_name = $user_row['last_name'];
 					$profile_pic = $user_row['profile_pic'];
 
-                    ?>
-                    <script>
-                        function toggle<?php echo $id; ?>() {
-                            var target = $(event.target);
-                            if(!target.is("a")) {
-                                var element = document.getElementById("toggleComment<?php echo $id; ?>");
 
-                                if(element.style.display == "block")
-                                    element.style.display = "none";
-                                else
-                                    element.style.display = "block";
-                            } 
-                           
-                        }
-                    </script>
+					?>
+					<script> 
+						function toggle<?php echo $id; ?>() {
 
-                    <?php
-                    
-                    $comments_check = mysqli_query($this->con, "SELECT * FROM comments WHERE post_id='$id'");
-                    $comments_check_num = mysqli_num_rows($comments_check);
-                    
-                    //Timeframe
+							var target = $(event.target);
+							if (!target.is("a")) {
+								var element = document.getElementById("toggleComment<?php echo $id; ?>");
+
+								if(element.style.display == "block") 
+									element.style.display = "none";
+								else 
+									element.style.display = "block";
+							}
+						}
+
+					</script>
+					<?php
+
+					$comments_check = mysqli_query($this->con, "SELECT * FROM comments WHERE post_id='$id'");
+					$comments_check_num = mysqli_num_rows($comments_check);
+
+
+					//Timeframe
 					$date_time_now = date("Y-m-d H:i:s");
 					$start_date = new DateTime($date_time); //Time of post
 					$end_date = new DateTime($date_time_now); //Current time
@@ -192,14 +201,15 @@ class Post {
 							$time_message = $interval->s . " seconds ago";
 						}
 					}
-                    
+
 					$str .= "<div class='status_post' onClick='javascript:toggle$id()'>
 								<div class='post_profile_pic'>
 									<img src='$profile_pic' width='50'>
 								</div>
 
 								<div class='posted_by' style='color:#ACACAC;'>
-									<a href='$added_by'> $first_name $last_name </a> $user_to &nbsp;&nbsp;&nbsp;&nbsp;$time_message$delete_button
+									<a href='$added_by'> $first_name $last_name </a> $user_to &nbsp;&nbsp;&nbsp;&nbsp;$time_message
+									$delete_button
 								</div>
 								<div id='post_body'>
 									$body
@@ -207,20 +217,21 @@ class Post {
 									<br>
 									<br>
 								</div>
-                                
-                                <div class='newsfeedPostOptions'>
-                                    Comments($comments_check_num)&nbsp;&nbsp;&nbsp;
-                                    <iframe src='like.php?post_id=$id'><iframe>
-                                </div>
+
+								<div class='newsfeedPostOptions'>
+									Comments($comments_check_num)&nbsp;&nbsp;&nbsp;
+									<iframe src='like.php?post_id=$id' scrolling='no'></iframe>
+								</div>
+
 							</div>
 							<div class='post_comment' id='toggleComment$id' style='display:none;'>
 								<iframe src='comment_frame.php?post_id=$id' id='comment_iframe' frameborder='0'></iframe>
 							</div>
 							<hr>";
-                }
-                
-                ?>
-                <script>
+				}
+
+				?>
+				<script>
 
 					$(document).ready(function() {
 
@@ -239,7 +250,7 @@ class Post {
 					});
 
 				</script>
-                <?php
+				<?php
 
 			} //End while loop
 
@@ -251,14 +262,13 @@ class Post {
 		}
 
 		echo $str;
-
-
 	}
 
-    public function loadProfilePosts($data, $limit) {
+
+	public function loadProfilePosts($data, $limit) {
 
 		$page = $data['page']; 
-        $profileUser = $data['profileUsername'];
+		$profileUser = $data['profileUsername'];
 		$userLoggedIn = $this->user_obj->getUsername();
 
 		if($page == 1) 
@@ -268,7 +278,7 @@ class Post {
 
 
 		$str = ""; //String to return 
-		$data_query = mysqli_query($this->con, "SELECT * FROM posts WHERE deleted='no' AND ((added_by='$profileUser' AND user_to='none') OR user_to='$profileUser')ORDER BY id DESC");
+		$data_query = mysqli_query($this->con, "SELECT * FROM posts WHERE deleted='no' AND ((added_by='$profileUser' AND user_to='none') OR user_to='$profileUser')  ORDER BY id DESC");
 
 		if(mysqli_num_rows($data_query) > 0) {
 
@@ -281,7 +291,8 @@ class Post {
 				$body = $row['body'];
 				$added_by = $row['added_by'];
 				$date_time = $row['date_added'];
-                    
+
+
 					if($num_iterations++ < $start)
 						continue; 
 
@@ -293,11 +304,12 @@ class Post {
 					else {
 						$count++;
 					}
-                    
-                    if($userLoggedIn == $added_by)
-                        $delete_button = "<button class='delete_button btn-danger' id='post$id'>X</button>";
-                    else
-                        $delete_button = "";
+
+					if($userLoggedIn == $added_by)
+						$delete_button = "<button class='delete_button btn-danger' id='post$id'>X</button>";
+					else 
+						$delete_button = "";
+
 
 					$user_details_query = mysqli_query($this->con, "SELECT first_name, last_name, profile_pic FROM users WHERE username='$added_by'");
 					$user_row = mysqli_fetch_array($user_details_query);
@@ -305,28 +317,30 @@ class Post {
 					$last_name = $user_row['last_name'];
 					$profile_pic = $user_row['profile_pic'];
 
-                    ?>
-                    <script>
-                        function toggle<?php echo $id; ?>() {
-                            var target = $(event.target);
-                            if(!target.is("a")) {
-                                var element = document.getElementById("toggleComment<?php echo $id; ?>");
 
-                                if(element.style.display == "block")
-                                    element.style.display = "none";
-                                else
-                                    element.style.display = "block";
-                            } 
-                           
-                        }
-                    </script>
+					?>
+					<script> 
+						function toggle<?php echo $id; ?>() {
 
-                    <?php
-                    
-                    $comments_check = mysqli_query($this->con, "SELECT * FROM comments WHERE post_id='$id'");
-                    $comments_check_num = mysqli_num_rows($comments_check);
-                    
-                    //Timeframe
+							var target = $(event.target);
+							if (!target.is("a")) {
+								var element = document.getElementById("toggleComment<?php echo $id; ?>");
+
+								if(element.style.display == "block") 
+									element.style.display = "none";
+								else 
+									element.style.display = "block";
+							}
+						}
+
+					</script>
+					<?php
+
+					$comments_check = mysqli_query($this->con, "SELECT * FROM comments WHERE post_id='$id'");
+					$comments_check_num = mysqli_num_rows($comments_check);
+
+
+					//Timeframe
 					$date_time_now = date("Y-m-d H:i:s");
 					$start_date = new DateTime($date_time); //Time of post
 					$end_date = new DateTime($date_time_now); //Current time
@@ -389,14 +403,15 @@ class Post {
 							$time_message = $interval->s . " seconds ago";
 						}
 					}
-                    
+
 					$str .= "<div class='status_post' onClick='javascript:toggle$id()'>
 								<div class='post_profile_pic'>
 									<img src='$profile_pic' width='50'>
 								</div>
 
 								<div class='posted_by' style='color:#ACACAC;'>
-									<a href='$added_by'> $first_name $last_name </a>&nbsp;&nbsp;&nbsp;&nbsp;$time_message$delete_button
+									<a href='$added_by'> $first_name $last_name </a> &nbsp;&nbsp;&nbsp;&nbsp;$time_message
+									$delete_button
 								</div>
 								<div id='post_body'>
 									$body
@@ -404,20 +419,20 @@ class Post {
 									<br>
 									<br>
 								</div>
-                                
-                                <div class='newsfeedPostOptions'>
-                                    Comments($comments_check_num)&nbsp;&nbsp;&nbsp;
-                                    <iframe src='like.php?post_id=$id'><iframe>
-                                </div>
+
+								<div class='newsfeedPostOptions'>
+									Comments($comments_check_num)&nbsp;&nbsp;&nbsp;
+									<iframe src='like.php?post_id=$id' scrolling='no'></iframe>
+								</div>
+
 							</div>
 							<div class='post_comment' id='toggleComment$id' style='display:none;'>
 								<iframe src='comment_frame.php?post_id=$id' id='comment_iframe' frameborder='0'></iframe>
 							</div>
 							<hr>";
-                
-                
-                ?>
-                <script>
+
+				?>
+				<script>
 
 					$(document).ready(function() {
 
@@ -436,7 +451,7 @@ class Post {
 					});
 
 				</script>
-                <?php
+				<?php
 
 			} //End while loop
 

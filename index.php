@@ -37,9 +37,7 @@ if(isset($_POST['post'])){
 
 		<div class="posts_area"></div>
 		<img id="loading" src="assets/images/icons/loading.gif">
-
-
-	</div>
+        </div>
 
 	<script>
 	var userLoggedIn = '<?php echo $userLoggedIn; ?>';
