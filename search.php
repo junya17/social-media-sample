@@ -46,7 +46,7 @@ if(isset($_GET['type'])) {
             echo mysqli_num_rows($usersReturnedQuery) . " results found: <br> <br>";
 
         echo "<p id='grey'>Try searching for:</p>";
-        echo "<a href='search.php?q=" . $query . "&type=name'>Names</a>,<a href='search.php?q=" . $query ."&type=username'>Usernames</a><br><br><hr>";
+        echo "<a href='search.php?q=" . $query . "&type=name'>Names</a>,<a href='search.php?q=" . $query ."&type=username'>Usernames</a><br><br><hr id='search_hr'>";
 
         while($row = mysqli_fetch_array($usersReturnedQuery)) {
             $user_obj = new User($con, $user['username']);
@@ -59,16 +59,30 @@ if(isset($_GET['type'])) {
                 //Generate button depending on friendship status
                 if($user_obj->isFriend($row['username']))
                     $button = "<input type='submit' name='" . $row['username'] . "' class='danger' value='Remove Friend'>"; 
-                else if($user_obj->didReceiveRequest($row['username'])) 
+                else if($user_obj->didReciveRequest($row['username'])) 
                     $button = "<input type='submit' name='" . $row['username'] . "' class='warning' value='respond to request'>"; 
                 else if($user_obj->didSendrequest($row['username']))
-                    $button = "<input class='default' value='Request Sent'>";
+                    $button = "<input type='submit' class='default' value='Request Sent'>";
                 else
                     $button = "<input type='submit' name='" . $row['username'] . "' class='success' value='Add Friend'>"; 
 
                 $mutual_friends = $user_obj->getMultiFriends($row['username']) . "friends in common";
                
-                
+                if(isset($_POST[$row['username']])) {
+
+                    if($user_obj->isFriend($row['username'])){
+                        $user_obj->removeFriend($row['username']);
+                        header("Location: http://$_SERVER[HTTP_HOST]$_SERVER[REQUEST_URI]");
+                    }
+                    else if($user_obj->didReciveRequest($row['username'])){
+                        header("Location: requests.php");
+                    }else if($user_obj->didSendRequest($row['username'])){
+
+                    }else{
+                        $user_obj->sendRequest($row['username']);
+                    }
+
+                } 
 
             }
 
@@ -88,7 +102,7 @@ if(isset($_GET['type'])) {
                         <br>
                         " . $mutual_friends ."<br>
                 </div>
-                <hr>";
+                ";
         }//End while
     }
 
