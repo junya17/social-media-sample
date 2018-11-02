@@ -50,6 +50,23 @@ if(isset($_SESSION['username'])) {
             <a href="index.php">Swirlfeed!</a>
         </div>
         
+        <div class="search">
+
+            <form action="search.php" method="GET" name="search_form">
+                <input type ="text" onkeyup="getLiveSearchUsers(this.value, '<?php echo $userLoggedIn; ?>')" name="q" placeholder="Search..." autocomplete="off" id="search_text_input">
+                <div class="button_holder">
+                    <img src="assets/images/icons/search.png">
+                </div>
+            </form>
+
+            <div class="search_results">
+            </div>
+
+            <div class="search_results_footer_empty">
+            </div>
+
+        </div>
+
         <nav>
            <?php
                 //Unread messages
@@ -59,7 +76,11 @@ if(isset($_SESSION['username'])) {
              //Unread notification
             $notifications = new notification($con, $userLoggedIn);
             $num_notifications = $notifications-> getUnreadNumber();
-            
+
+             //Unread notification
+             $user_obj = new User($con, $userLoggedIn);
+             $num_requests = $user_obj->getNumberOfFriendRequests();
+
             ?>
             <a href="<?php echo $user['first_name'] ?>">
                 <?php echo $user['first_name']; ?><!-- database username -->
@@ -83,6 +104,10 @@ if(isset($_SESSION['username'])) {
             </a>
             <a href="requests.php">
                 <i class="fa fa-users fa-lg"></i>
+                <?php
+                if($num_requests > 0)
+                 echo '<span class="notification_badge" id="unread_requests">' . $num_requests .'</span>';
+                ?>
             </a>
             <a href="index.php">
                 <i class="fa fa-cog fa-lg"></i>
@@ -100,13 +125,13 @@ if(isset($_SESSION['username'])) {
     
     $(document).ready(function() {
 
-		$(.fropdown_data_window).scroll(function() {
-			var inner_height = $('.fropdown_data_window').innerHeight(); //Div containing posts
+		$('.dropdown_data_window').scroll(function() {
+			var inner_height = $('.dropdown_data_window').innerHeight(); //Div containing posts
 			var scroll_top = $('.dropdown_data_window').scrollTop();
 			var page = $('.dropdown_data_window').find('.nextPageDropdownData').val();
 			var noMoreData = $('.dropdown_data_window').find('.noMoreDropdownData').val();
 
-			if ((scroll_top + inner_height >= $.dropdown_data_window')[0].scrollHeight) && noMoreData == 'false') 
+			if ((scroll_top + inner_height >= $('.dropdown_data_window')[0].scrollHeight) && noMoreData == 'false'){ 
 				var pageName; //Holds name of page to send ajax request to
                 var type = $('#dropdown_data_type').val();
                 
